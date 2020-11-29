@@ -5,6 +5,8 @@
     font-size: 16px;
     font-weight: 400;
     color: rgb(20, 17, 66);
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
 body {
