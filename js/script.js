@@ -7,6 +7,10 @@ icon.innerHTML = '<img src="icons/time.svg">'
 let submitted = false;
 let stationdata;
 
+let time = new Date();
+let timenow = document.getElementById("timenow");
+timenow.innerHTML = time;
+
 //search stationlist.json and filter
 const searchStates = async searchText => {
     const res = await fetch('https://rata.digitraffic.fi/api/v1/metadata/stations');
@@ -72,7 +76,7 @@ const timetableURL = () => {
     //digitraffic (another fetch also) and replaces it with correct stationcode
     console.log('this is the stationcode to request: ' + stationCode);
     const stationURL = 'https://rata.digitraffic.fi/api/v1//live-trains/station/';
-    const searchURL = `${stationURL}${stationCode}?minutes_before_departure=0&minutes_after_departure=60&minutes_before_arrival=0&minutes_after_arrival=0&train_categories=Commuter`;
+    const searchURL = `${stationURL}${stationCode}?minutes_before_departure=60&minutes_after_departure=0&minutes_before_arrival=0&minutes_after_arrival=0&train_categories=Commuter`;
     return searchURL;
 }
 
