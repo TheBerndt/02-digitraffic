@@ -67,6 +67,7 @@ input {
 }
 
 #searchbtn {
+    border-radius: 4px;
     width: 100px;
     background-color: rgb(73, 62, 218);
     color: white;
