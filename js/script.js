@@ -1,4 +1,4 @@
-
+//declaring variables
 let table = document.getElementById('json');
 const search = document.getElementById('search');
 const matchList = document.getElementById('stationQueries');
@@ -15,7 +15,7 @@ timenow.innerHTML = time;  */
 const searchStates = async searchText => {
     const res = await fetch('https://rata.digitraffic.fi/api/v1/metadata/stations');
     const states = await res.json();
-    //match to current input
+    //match to current input using regexp
     let matches = states.filter(state => {
         const regex = new RegExp(`^${searchText}`, 'gi');
         return state.stationName.match(regex) || state.stationShortCode.match(regex);
@@ -34,24 +34,31 @@ const searchStates = async searchText => {
 
 }
 
-//stationShortCode to fetch timetables
+//stationShortCode to get correct timetables for station (it's added in the URL)
 let code = '';
+let currentStationName = '';
 
+
+
+//get matches and render them in html using map method
 const outputHtml = matches => {
     if(matches.length > 0) {
         const html = matches.map(match => `<option value="${match.stationName}"><option value="${match.stationShortCode}">`).join(' ');
         console.log('html is: ' + html);
         matchList.innerHTML = html;
+        currentStationName = matches.map(match => `${match.stationName}`);
         code = matches.map(match => `${match.stationShortCode}`);
         //code = code.toString().split(',')[0];
         console.log('code from output is:' + code);
     }
 }
 
+
+//eventlistened for input, activates searchStates function
 search.addEventListener('input', () => searchStates(search.value)); 
 
 
-//handle input submit
+//handle submit
 form.onsubmit = () => {
     //diable default submit
     event.preventDefault();
@@ -92,6 +99,7 @@ const fetchDigiTraffic = async () => {
             })
             .then((stationData) => {
                 console.log(stationData);
+                document.getElementById("currentStationName").innerHTML = currentStationName;
 
                 {
                     for (let i in stationData) {

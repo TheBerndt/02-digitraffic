@@ -28,7 +28,8 @@ h1 {
 
 h2 {
     font-size: 1rem;
-    padding-left: 8px;
+    font-weight: 400;
+    padding-left: 16px;
     margin-bottom: 24px;
 }
 input:focus, textarea:focus, select:focus {
@@ -133,4 +134,11 @@ tr:nth-child(even) {
 #clock {
    width: 20px;
    padding-top: 4px;
+}
+
+#currentStationName {
+    font-size: 1rem;
+    font-weight: 600;
+    padding-left: 16px;
+    margin-bottom: 0px;
 }
