@@ -7,55 +7,49 @@ icon.innerHTML = '<img src="icons/time.svg">'
 let submitted = false;
 let stationdata;
 
-/* let time = new Date();
-let timenow = document.getElementById("timenow");
-timenow.innerHTML = time;  */
-
-//search stationlist.json and filter
-const searchStates = async searchText => {
+/* fetch stationlist that can be used to match
+searched station and the stationshortcode that is
+used in URL to get timetables then search
+returned json and filter with regexp matchin stationname
+OR stationshortcode */
+const searchStations = async searchMeta => {
     const res = await fetch('https://rata.digitraffic.fi/api/v1/metadata/stations');
-    const states = await res.json();
+    const stations = await res.json();
     //match to current input using regexp
-    let matches = states.filter(state => {
-        const regex = new RegExp(`^${searchText}`, 'gi');
-        return state.stationName.match(regex) || state.stationShortCode.match(regex);
+    let matches = stations.filter(station => {
+        const regex = new RegExp(`^${searchMeta}`, 'gi');
+        return station.stationName.match(regex) || station.stationShortCode.match(regex);
     });
-
     //if input is empty, matches = empty array and empty html
-    if (searchText.length === 0) {
-        matches = [];
+    if (searchMeta.length === 0) {
+        stations = [];
         matchList.innerHTML = '';
     }
-
-    console.log(`matches are: ${matches}`);
-    
-
-    outputHtml(matches);
-
+    //console.log(`matches are: ${matches}`);
+    matchStations(matches);
 }
 
 //stationShortCode to get correct timetables for station (it's added in the URL)
-let code = '';
+let matchedCode = '';
 let currentStationName = '';
 
-
-
 //get matches and render them in html using map method
-const outputHtml = matches => {
+const matchStations = matches => {
     if(matches.length > 0) {
         const html = matches.map(match => `<option value="${match.stationName}"><option value="${match.stationShortCode}">`).join(' ');
         console.log('html is: ' + html);
         matchList.innerHTML = html;
         currentStationName = matches.map(match => `${match.stationName}`);
-        code = matches.map(match => `${match.stationShortCode}`);
+        matchedCode = matches.map(match => `${match.stationShortCode}`);
         //code = code.toString().split(',')[0];
-        console.log('code from output is:' + code);
+        console.log('code from output is:' + matchedCode);
     }
 }
 
 
+
 //eventlistened for input, activates searchStates function
-search.addEventListener('input', () => searchStates(search.value)); 
+search.addEventListener('input', () => searchStations(search.value)); 
 
 
 //handle submit
@@ -67,7 +61,7 @@ form.onsubmit = () => {
     if (submitted == false) {
         submitted = true;
         fetchDigiTraffic();
-        console.log(submitted);
+        console.log(`submitted is :${submitted}`);
     } else {
         table.innerHTML = '';
         fetchDigiTraffic();
@@ -76,22 +70,16 @@ form.onsubmit = () => {
 
 //add searched stationcode string to URL
 const timetableURL = () => {
-    const form = document.getElementById('form');
-    let stationCode = code;
-    console.log('stationcode is: ' + stationCode);
-    //make here function that searches the station name from
-    //digitraffic (another fetch also) and replaces it with correct stationcode
-    console.log('this is the stationcode to request: ' + stationCode);
-    const stationURL = 'https://rata.digitraffic.fi/api/v1//live-trains/station/';
-    const searchURL = `${stationURL}${stationCode}?minutes_before_departure=60&minutes_after_departure=0&minutes_before_arrival=0&minutes_after_arrival=0&train_categories=Commuter`;
-    return searchURL;
+    const stationCode = matchedCode;
+    //console.log('stationcode is: ' + stationCode);
+    //console.log('this is the stationcode to request: ' + stationCode);
+    const URL = `https://rata.digitraffic.fi/api/v1//live-trains/station/${stationCode}?minutes_before_departure=60&minutes_after_departure=0&minutes_before_arrival=0&minutes_after_arrival=0&train_categories=Commuter`;
+    return URL;
 }
 
 //fetch data from digitraffic with url containing the stationcode
 const fetchDigiTraffic = async () => {
-
     try {
-
         const URL = timetableURL();
         await fetch(URL)
             .then((response) => {
@@ -101,7 +89,8 @@ const fetchDigiTraffic = async () => {
                 console.log(stationData);
                 document.getElementById("currentStationName").innerHTML = currentStationName;
 
-                {
+                //looping the fetched JSONs
+                {   
                     for (let i in stationData) {
                         const commuterLineID = stationData[i].commuterLineID;
                         let commercialTrack = stationData[i].timeTableRows[i].commercialTrack;
@@ -110,17 +99,23 @@ const fetchDigiTraffic = async () => {
                         const start = stationData[i].timeTableRows[0].stationShortCode;
                         console.log(destination);
                         console.log(start);
-                        //trackdata is sometimes missing, replacing those with dash
+                        //trackdata is sometimes missing from digitraffics data, replacing those with dash to indicate missing information
                         if (commercialTrack == '') {
                             commercialTrack = '-';
                         }
 
-                        console.log('commercialtrack is ' + commercialTrack);
+                        //console.log('commercialtrack is ' + commercialTrack);
                         let scheduledTime = stationData[i].timeTableRows[i].scheduledTime;
-                        console.log(scheduledTime);
-                        scheduledTime = scheduledTime.split('T')[1];
-                        scheduledTime = scheduledTime.slice(0, -5);
+                        //console.log(scheduledTime);
 
+                        //take timestamp from digitraffic json and convert it from UTC+0 timezone to UTC+2
+                        let localTime = new Date(scheduledTime);
+                        //console.log(`local:${localTime}`);
+                        localTimeString = localTime.toLocaleString();
+                        //console.log(localTimeString);
+                        let renderTime = localTimeString.split(',')[1];
+                       
+                        //create table for rendering the time table data
                         let row = table.insertRow(i);
                         let train = row.insertCell(0);
                         train.innerHTML = `${commuterLineID}`;
@@ -131,7 +126,7 @@ const fetchDigiTraffic = async () => {
                         clock.innerHTML = `<img id="clock" src="icons/time.svg">`
                         let departure = row.insertCell(3);
                         departure.id = 'departurecell';
-                        departure.innerHTML = `${scheduledTime}`;
+                        departure.innerHTML = `${renderTime}`;
                         let from = row.insertCell(4);
                         from.innerHTML = `${start}`;
                         let to = row.insertCell(5);
@@ -158,9 +153,9 @@ const fetchDigiTraffic = async () => {
                 }
 
             })
-
+            //catch errors 
     } catch (error) {
-        console.log(error)
+        console.log(`There was an error: ${error}`);
     }
 
 }

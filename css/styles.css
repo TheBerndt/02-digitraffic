@@ -23,7 +23,7 @@ h1 {
     font-weight: 600;
     margin-top: 0px;
     margin-bottom: 0px;
-    padding: 8px;
+    padding: 16px;
 }
 
 h2 {
@@ -61,7 +61,7 @@ caption {
 input {
     font-size: 1rem;
     width: 70%;
-    margin-left: 8px;
+    margin-left: 16px;
     margin-right: 8px;
     margin-bottom: 16px;
     padding: 8px;
@@ -83,7 +83,7 @@ input {
 
 table {
     border-collapse: collapse;
-    margin: 8px;
+    margin: 16px;
 }
 
 td {
@@ -137,8 +137,15 @@ tr:nth-child(even) {
 }
 
 #currentStationName {
+    display: inline-block;
     font-size: 1rem;
     font-weight: 600;
-    padding-left: 16px;
+    padding: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-align: center;
+    margin-left: 16px;
     margin-bottom: 0px;
+    border-radius: 100px;
+    background-color: rgb(234, 236, 255);
 }
