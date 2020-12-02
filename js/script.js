@@ -4,6 +4,7 @@ const search = document.getElementById('search');
 const matchList = document.getElementById('stationQueries');
 const icon = document.createElementNS('http://www.w3.org/2000/svg', 'img');
 icon.innerHTML = '<img src="icons/time.svg">'
+document.getElementById("currentStationName").style.display = 'none';
 let submitted = false;
 let stationdata;
 
@@ -31,7 +32,6 @@ const searchStations = async searchMeta => {
 
 //stationShortCode to get correct timetables for station (it's added in the URL)
 let matchedCode = '';
-let currentStationName = '';
 
 //get matches and render them in html using map method
 const matchStations = matches => {
@@ -88,6 +88,9 @@ const fetchDigiTraffic = async () => {
             .then((stationData) => {
                 console.log(stationData);
                 document.getElementById("currentStationName").innerHTML = currentStationName;
+                document.getElementById("currentStationName").style.display = 'inline-block';
+
+                
 
                 //looping the fetched JSONs
                 {   
