@@ -114,6 +114,7 @@ const fetchDigiTraffic = async () => {
                         //take timestamp from digitraffic json and convert it from UTC+0 timezone to UTC+2
                         let localTime = new Date(scheduledTime);
                         //console.log(`local:${localTime}`);
+                        //this is a fix for displaying time correctly in iOS
                         localTimeString = localTime.toLocaleTimeString('fi-FI');
                         //console.log(localTimeString);
                         //let renderTime = localTimeString.split(',')[1];
