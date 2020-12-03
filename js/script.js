@@ -114,9 +114,9 @@ const fetchDigiTraffic = async () => {
                         //take timestamp from digitraffic json and convert it from UTC+0 timezone to UTC+2
                         let localTime = new Date(scheduledTime);
                         //console.log(`local:${localTime}`);
-                        localTimeString = localTime.toLocaleString();
+                        localTimeString = localTime.toLocaleTimeString('fi-FI');
                         //console.log(localTimeString);
-                        let renderTime = localTimeString.split(',')[1];
+                        //let renderTime = localTimeString.split(',')[1];
                        
                         //create table for rendering the time table data
                         let row = table.insertRow(i);
@@ -129,7 +129,7 @@ const fetchDigiTraffic = async () => {
                         clock.innerHTML = `<img id="clock" src="icons/time.svg">`
                         let departure = row.insertCell(3);
                         departure.id = 'departurecell';
-                        departure.innerHTML = `${renderTime}`;
+                        departure.innerHTML = `${localTimeString}`;
                         let from = row.insertCell(4);
                         from.innerHTML = `${start}`;
                         let to = row.insertCell(5);
